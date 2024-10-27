@@ -96,6 +96,10 @@ public virtual class FeatureFlag {
             .contains(getReason());
     }
 
+    public Boolean isDisabled() {
+        return !isEnabled();
+    }
+
     public FeatureFlagReason getReason() {
         // is mocked
         if (Test.isRunningTest() && mockFlags.get(name) != null) {

@@ -11,6 +11,7 @@ private class FeatureFlagTest {
         flag.setProvider(provider);
         Assert.areEqual(FeatureFlagReason.APEX_ENABLED, flag.getReason(), 'Incorrect reason.');
         Assert.isTrue(flag.isEnabled(), 'Incorrect isEnabled.');
+        Assert.isFalse(flag.isDisabled(), 'Incorrect isDisabled.');
         Assert.isTrue(FeatureFlag.isEnabled(flag.getName()), 'Incorrect isEnabled.');
     }
 
