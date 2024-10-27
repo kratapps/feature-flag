@@ -15,8 +15,8 @@
  * @author kratapps.com
  */
 public virtual class FeatureFlag {
-    private static final Map<String, Boolean> apexValues = new Map<String, Boolean>();
-    private static final Map<String, Boolean> mockValues = new Map<String, Boolean>();
+    private static Map<String, Boolean> apexValues = new Map<String, Boolean>();
+    private static Map<String, Boolean> mockValues = new Map<String, Boolean>();
 
     private final String name;
     private FeatureFlagProvider provider = new FeatureFlagProvider();
@@ -88,6 +88,10 @@ public virtual class FeatureFlag {
         if (apexValues.get(name) != null) {
             return apexValues.get(name) ? FeatureFlagReason.APEX_ENABLED : FeatureFlagReason.APEX_DISABLED;
         }
+        return getProvidedReason();
+    }
+
+    private FeatureFlagReason getProvidedReason() {
         Map<String, FeatureFlag__mdt> metadata = provider.getFeatureFlags();
         Set<String> permissionNames = provider.getCustomPermissionNames();
         // feature flag has name
