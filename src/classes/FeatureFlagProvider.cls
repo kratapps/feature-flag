@@ -1,7 +1,8 @@
 /*
  * BSD 3-Clause License
- * https://github.com/kratapps/component-library/blob/main/LICENSE
+ * https://github.com/kratapps/feature-flag/blob/main/LICENSE
  */
+
 /**
  * @description Feature Flag.
  *
