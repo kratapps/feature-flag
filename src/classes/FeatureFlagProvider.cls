@@ -4,13 +4,14 @@
  */
 
 /**
- * @description Feature Flag.
+ * @description Feature Flag Provider.
  *
- * Docs: https://kratapps.com/component-library/feature-flag
+ * Docs: <a href="https://kratapps.com/component-library/feature-flag"></a>
+ *
  * Tests: FeatureFlagTest
  *
  * Inspired by salesforce-feature-flags project by Pablo Gonzalez
- * https://github.com/pgonzaleznetwork/salesforce-feature-flags
+ * <a href="https://github.com/pgonzaleznetwork/salesforce-feature-flags"></a>
  *
  * @author kratapps.com
  */
