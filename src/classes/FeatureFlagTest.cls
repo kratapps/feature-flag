@@ -11,6 +11,13 @@ private class FeatureFlagTest {
         flag.setProvider(provider);
         Assert.areEqual(FeatureFlagReason.APEX_ENABLED, flag.getReason(), 'Incorrect reason.');
         Assert.isTrue(flag.isEnabled(), 'Incorrect isEnabled.');
+        Assert.isTrue(FeatureFlag.isEnabled(flag.getName()), 'Incorrect isEnabled.');
+    }
+
+    @IsTest
+    static void anonymousFlagHasName() {
+        FeatureFlag flag = new FeatureFlag();
+        Assert.isTrue(String.isNotBlank(flag.getName()), 'Name is expected.');
     }
 
     @IsTest
@@ -21,6 +28,7 @@ private class FeatureFlagTest {
         flag.setProvider(provider);
         Assert.areEqual(FeatureFlagReason.FLAG_NOT_FOUND, flag.getReason(), 'Incorrect reason.');
         Assert.isFalse(flag.isEnabled(), 'Incorrect isEnabled.');
+        Assert.isFalse(FeatureFlag.isEnabled(featureName), 'Incorrect isEnabled.');
     }
 
     @IsTest
@@ -29,13 +37,13 @@ private class FeatureFlagTest {
         FeatureFlag flag = new FeatureFlag(featureName);
         ProviderMock provider = new ProviderMock();
         flag.setProvider(provider);
-        flag.setMockValue(true);
+        flag.enableMock();
         Assert.areEqual(FeatureFlagReason.MOCK_ENABLED, flag.getReason(), 'Incorrect reason.');
         Assert.isTrue(flag.isEnabled(), 'Incorrect isEnabled.');
-        flag.clearMockValue();
+        flag.clearMock();
         Assert.areEqual(FeatureFlagReason.FLAG_NOT_FOUND, flag.getReason(), 'Incorrect reason.');
         Assert.isFalse(flag.isEnabled(), 'Incorrect isEnabled.');
-        flag.setMockValue(false);
+        flag.disableMock();
         Assert.areEqual(FeatureFlagReason.MOCK_DISABLED, flag.getReason(), 'Incorrect reason.');
         Assert.isFalse(flag.isEnabled(), 'Incorrect isEnabled.');
     }
@@ -46,13 +54,13 @@ private class FeatureFlagTest {
         FeatureFlag flag = new FeatureFlag(featureName);
         ProviderMock provider = new ProviderMock();
         flag.setProvider(provider);
-        flag.setValue(true);
+        flag.enable();
         Assert.areEqual(FeatureFlagReason.APEX_ENABLED, flag.getReason(), 'Incorrect reason.');
         Assert.isTrue(flag.isEnabled(), 'Incorrect isEnabled.');
-        flag.clearValue();
+        flag.reset();
         Assert.areEqual(FeatureFlagReason.FLAG_NOT_FOUND, flag.getReason(), 'Incorrect reason.');
         Assert.isFalse(flag.isEnabled(), 'Incorrect isEnabled.');
-        flag.setValue(false);
+        flag.disable();
         Assert.areEqual(FeatureFlagReason.APEX_DISABLED, flag.getReason(), 'Incorrect reason.');
         Assert.isFalse(flag.isEnabled(), 'Incorrect isEnabled.');
     }
@@ -121,6 +129,66 @@ private class FeatureFlagTest {
         Assert.isFalse(provider.checkPermission('NON_EXISTENT_FEATURE'), 'Non existent permission was granted.');
         // 1 query expected for CustomPermission
         Assert.areEqual(1, Limits.getQueries(), 'Different number of queries is expected.');
+    }
+
+    @IsTest
+    static void enableWillThrowExceptionForNullFeatureName() {
+        try {
+            FeatureFlag.enable(null);
+            Assert.fail('Exception is expected.');
+        } catch (IllegalArgumentException e) {
+            Assert.isTrue(e.getMessage().contains('featureName cannot be blank'), 'Different exception message is expected.');
+        }
+    }
+
+    @IsTest
+    static void disableWillThrowExceptionForNullFeatureName() {
+        try {
+            FeatureFlag.disable(null);
+            Assert.fail('Exception is expected.');
+        } catch (IllegalArgumentException e) {
+            Assert.isTrue(e.getMessage().contains('featureName cannot be blank'), 'Different exception message is expected.');
+        }
+    }
+
+    @IsTest
+    static void resetWillThrowExceptionForNullFeatureName() {
+        try {
+            FeatureFlag.reset(null);
+            Assert.fail('Exception is expected.');
+        } catch (IllegalArgumentException e) {
+            Assert.isTrue(e.getMessage().contains('featureName cannot be blank'), 'Different exception message is expected.');
+        }
+    }
+
+    @IsTest
+    static void enableMockWillThrowExceptionForNullFeatureName() {
+        try {
+            FeatureFlag.enableMock(null);
+            Assert.fail('Exception is expected.');
+        } catch (IllegalArgumentException e) {
+            Assert.isTrue(e.getMessage().contains('featureName cannot be blank'), 'Different exception message is expected.');
+        }
+    }
+
+    @IsTest
+    static void disableMockWillThrowExceptionForNullFeatureName() {
+        try {
+            FeatureFlag.disableMock(null);
+            Assert.fail('Exception is expected.');
+        } catch (IllegalArgumentException e) {
+            Assert.isTrue(e.getMessage().contains('featureName cannot be blank'), 'Different exception message is expected.');
+        }
+    }
+
+    @IsTest
+    static void clearMockWillThrowExceptionForNullFeatureName() {
+        try {
+            FeatureFlag.clearMock(null);
+            Assert.fail('Exception is expected.');
+        } catch (IllegalArgumentException e) {
+            Assert.isTrue(e.getMessage().contains('featureName cannot be blank'), 'Different exception message is expected.');
+        }
     }
 
     private class ProviderMock extends FeatureFlagProvider {

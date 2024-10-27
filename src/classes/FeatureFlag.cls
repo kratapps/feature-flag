@@ -6,49 +6,66 @@
 /**
  * @description Feature Flag.
  *
- * Docs: https://kratapps.com/component-library/feature-flag
+ * Docs: <a href="https://kratapps.com/component-library/feature-flag"></a>
+ *
  * Tests: FeatureFlagTest
  *
  * Inspired by salesforce-feature-flags project by Pablo Gonzalez
- * https://github.com/pgonzaleznetwork/salesforce-feature-flags
+ * <a href="https://github.com/pgonzaleznetwork/salesforce-feature-flags"></a>
  *
  * @author kratapps.com
  */
+@SuppressWarnings('PMD.cyclomaticcomplexity, PMD.cognitivecomplexity')
 public virtual class FeatureFlag {
-    private static Map<String, Boolean> apexValues = new Map<String, Boolean>();
-    private static Map<String, Boolean> mockValues = new Map<String, Boolean>();
+    private static Map<String, Boolean> apexFlags = new Map<String, Boolean>();
+    private static Map<String, Boolean> mockFlags = new Map<String, Boolean>();
 
     private final String name;
     private FeatureFlagProvider provider = new FeatureFlagProvider();
 
-    public static void setValue(String featureName, Boolean enabled) {
+    public static void enable(String featureName) {
         if (String.isBlank(featureName)) {
             throw new IllegalArgumentException('featureName cannot be blank: ' + featureName);
         }
-        apexValues.put(featureName, enabled);
+        apexFlags.put(featureName, true);
     }
 
-    public static void clearValue(String featureName) {
+    public static void disable(String featureName) {
         if (String.isBlank(featureName)) {
             throw new IllegalArgumentException('featureName cannot be blank: ' + featureName);
         }
-        apexValues.remove(featureName);
+        apexFlags.put(featureName, false);
+    }
+
+    public static void reset(String featureName) {
+        if (String.isBlank(featureName)) {
+            throw new IllegalArgumentException('featureName cannot be blank: ' + featureName);
+        }
+        apexFlags.remove(featureName);
     }
 
     @TestVisible
-    private static void setMockValue(String featureName, Boolean enabled) {
+    private static void enableMock(String featureName) {
         if (String.isBlank(featureName)) {
             throw new IllegalArgumentException('featureName cannot be blank: ' + featureName);
         }
-        mockValues.put(featureName, enabled);
+        mockFlags.put(featureName, true);
     }
 
     @TestVisible
-    private static void clearMockValue(String featureName) {
+    private static void disableMock(String featureName) {
         if (String.isBlank(featureName)) {
             throw new IllegalArgumentException('featureName cannot be blank: ' + featureName);
         }
-        mockValues.remove(featureName);
+        mockFlags.put(featureName, false);
+    }
+
+    @TestVisible
+    private static void clearMock(String featureName) {
+        if (String.isBlank(featureName)) {
+            throw new IllegalArgumentException('featureName cannot be blank: ' + featureName);
+        }
+        mockFlags.remove(featureName);
     }
 
     @AuraEnabled(Cacheable=true)
@@ -57,8 +74,8 @@ public virtual class FeatureFlag {
     }
 
     public FeatureFlag() {
-        this.name = Crypto.getRandomLong().toString();
-        setValue(true);
+        this.name = 'AnonymousFlag_' + Crypto.getRandomLong().toString();
+        enable();
     }
 
     public FeatureFlag(String name) {
@@ -81,12 +98,12 @@ public virtual class FeatureFlag {
 
     public FeatureFlagReason getReason() {
         // is mocked
-        if (Test.isRunningTest() && mockValues.get(name) != null) {
-            return mockValues.get(name) ? FeatureFlagReason.MOCK_ENABLED : FeatureFlagReason.MOCK_DISABLED;
+        if (Test.isRunningTest() && mockFlags.get(name) != null) {
+            return mockFlags.get(name) ? FeatureFlagReason.MOCK_ENABLED : FeatureFlagReason.MOCK_DISABLED;
         }
         // is overridden in apex
-        if (apexValues.get(name) != null) {
-            return apexValues.get(name) ? FeatureFlagReason.APEX_ENABLED : FeatureFlagReason.APEX_DISABLED;
+        if (apexFlags.get(name) != null) {
+            return apexFlags.get(name) ? FeatureFlagReason.APEX_ENABLED : FeatureFlagReason.APEX_DISABLED;
         }
         return getProvidedReason();
     }
@@ -114,21 +131,30 @@ public virtual class FeatureFlag {
         this.provider = provider;
     }
 
-    public void setValue(Boolean enabled) {
-        setValue(name, enabled);
+    public void enable() {
+        enable(name);
     }
 
-    public void clearValue() {
-        clearValue(name);
+    public void disable() {
+        disable(name);
+    }
+
+    public void reset() {
+        reset(name);
     }
 
     @TestVisible
-    private void setMockValue(Boolean enabled) {
-        setMockValue(name, enabled);
+    private void enableMock() {
+        enableMock(name);
     }
 
     @TestVisible
-    private void clearMockValue() {
-        clearMockValue(name);
+    private void disableMock() {
+        disableMock(name);
+    }
+
+    @TestVisible
+    private void clearMock() {
+        clearMock(name);
     }
 }
