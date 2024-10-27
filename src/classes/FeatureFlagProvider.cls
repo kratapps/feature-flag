@@ -22,10 +22,11 @@ public virtual with sharing class FeatureFlagProvider {
         return FeatureManagement.checkPermission(featureName);
     }
 
+    @SuppressWarnings('PMD.apexcrudviolation')
     public virtual Set<String> getCustomPermissionNames() {
         if (customPermissionNames == null) {
             customPermissionNames = new Set<String>();
-            List<CustomPermission> perms = [SELECT Id, DeveloperName FROM CustomPermission WITH USER_MODE];
+            List<CustomPermission> perms = [SELECT Id, DeveloperName FROM CustomPermission];
             for (CustomPermission perm : perms) {
                 customPermissionNames.add(perm.DeveloperName);
             }
