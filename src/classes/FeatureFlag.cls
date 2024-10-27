@@ -15,7 +15,7 @@
  *
  * @author kratapps.com
  */
-@SuppressWarnings('PMD.cyclomaticcomplexity')
+@SuppressWarnings('PMD.cyclomaticcomplexity, PMD.cognitivecomplexity')
 public virtual class FeatureFlag {
     private static Map<String, Boolean> apexFlags = new Map<String, Boolean>();
     private static Map<String, Boolean> mockFlags = new Map<String, Boolean>();
